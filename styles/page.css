@@ -1,0 +1,113 @@
+@import "reset.css";
+
+:root {
+    /* Цвета */
+    --white: #ffffff;
+    --light-grey: #dae6ec;
+    --blue: #005cff;
+    --black: #000000;
+
+    /* Размеры элементов */
+    --input-height: 30px;
+    --input-width: 50px;
+    --input-border-radius: calc(var(--input-height) / 2);
+
+    --switch-padding: 2px;
+    --thumb-size: calc(var(--input-height) - var(--switch-padding) * 2);
+}
+
+body {
+    font-family: Roboto, Arial, Helvetica, sans-serif;
+}
+
+.demo {
+    width: 100%;
+    height: 100%;
+    padding: 16px;
+}
+
+.demo__title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.demo__progress-and-controls {
+    width: auto;
+    height: 95vh;
+
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 1fr 1fr;
+
+    align-items: center;
+    justify-items: center;
+
+    padding: 60px 0px 130px;
+}
+
+.demo__controls {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    width: min-content;
+    gap: 8px;
+}
+
+.control {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+
+    font-weight: 600;
+}
+
+.field {
+    width: var(--input-width);
+    height: var(--input-height);
+    border-radius: var(--input-border-radius);
+
+    text-align: center;
+    font-size: 100%;
+    border: 2px solid;
+    font-weight: 600;
+}
+
+
+/* Переключатель */
+
+.switch {
+    width: var(--input-width);
+    height: var(--input-height);
+    padding: var(--switch-padding);
+    border-radius: var(--input-border-radius);
+
+    position: relative;
+    background-color: var(--light-grey);
+    transition: background-color 0.25s ease;
+}
+
+.switch::before {
+    position: absolute;
+    content: "";
+    width: var(--thumb-size);
+    height: var(--thumb-size);
+    background-color: var(--white);
+    border-radius: 50%;
+    transition: transform 0.25s ease;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.switch:has(input:checked) {
+  background-color: var(--blue);
+}
+
+.switch:has(input:checked)::before {
+  transform: translateX(20px);
+}

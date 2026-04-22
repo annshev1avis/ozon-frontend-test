@@ -1,0 +1,13 @@
+.progress__track {
+    fill: none;
+    stroke: var(--light-grey);
+    stroke-width: 10px;
+}
+
+.progress__value {
+    fill: none;
+    stroke: var(--blue);
+    stroke-width: 10px;
+    stroke-linecap: square;
+    transition: stroke-dashoffset 0.25s ease;
+}

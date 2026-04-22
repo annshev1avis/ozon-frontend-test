@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Прогресс-бар</title>
+  <link rel="stylesheet" href="./styles/page.css" >
+  <link rel="stylesheet" href="./components/progress/progress.css" >
+</head>
+
+<body>
+  <main>
+    <section class="demo">
+      <h1 class="demo__title">Progress</h1>
+      <div class="demo__container">
+        <div class="demo__progress-and-controls">
+          <div id="progress-container" class="demo__progress">
+            <svg
+              class="progress"
+              width="150"
+              height="150"
+            >
+              <circle
+                class="progress__track"
+                cx="75"
+                cy="75"
+                r="65"
+              ></circle>
+              <circle
+                class="progress__value"
+                cx="75"
+                cy="75"
+                r="65"
+                stroke-dasharray="300.48"
+                stroke-dashoffset="141.37"
+              ></circle>
+            </svg>
+          </div>
+          <div class="demo__controls">
+            <div class="control">
+              <input id="value-input" class="field" type="number" value="65" min="0" max="100"/>
+              <label for="value-input">Value</label>
+            </div>
+
+            <div class="control">
+              <label class="switch">
+                <input id="animate-input" type="checkbox"/>
+              </label>
+              <label for="animate-input">Animate</label>
+            </div>
+            
+            <div class="control">
+              <label class="switch">
+                <input id="hide-input" type="checkbox"/>
+              </label>
+              <label for="hide-input">Hide</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
