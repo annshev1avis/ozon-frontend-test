@@ -14,6 +14,11 @@ function normalizeProgressValue(value) {
     return clamp(numericValue, 0, 100);
 }
 
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+const createSvgEl = (tag) =>
+    document.createElementNS(SVG_NS, tag);
+
 export default class Progress {
     constructor(container, options = {}) {
         if (!container) {
@@ -21,122 +26,147 @@ export default class Progress {
         }
 
         this.container = container;
-        this.state = {
-            value: normalizeProgressValue(options.value),
-            animated: Boolean(options.animated),
-            hidden: Boolean(options.hidden),
-        };
-        this.config = {
-            size: options.size ?? 130,
-            strokeWidth: options.strokeWidth ?? 10,
-            duration: options.duration ?? 1200,
-            trackColor: options.trackColor,
-            valueColor: options.valueColor,
-        };
+
+        // state
+        this.value = normalizeProgressValue(options.value);
+        this.animated = !!options.animated;
+        this.hidden = !!options.hidden;
+
+        // config
+        this.size = options.size ?? 130;
+        this.strokeWidth = options.strokeWidth ?? 10;
+        this.duration = options.duration ?? 1200;
+        this.trackColor = options.trackColor;
+        this.valueColor = options.valueColor;
 
         this.render();
     }
 
+    // ---------- lifecycle ----------
+
     render() {
-        const { size, strokeWidth, duration, trackColor, valueColor } = this.config;
-        const center = size / 2;
-        const radius = (size - strokeWidth) / 2;
-
-        this.circumference = 2 * Math.PI * radius;
-
-        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.setAttribute("class", "progress");
-        svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
-        svg.setAttribute("width", size);
-        svg.setAttribute("height", size);
-
-        if (trackColor) {
-            svg.style.setProperty("--progress-track", trackColor);
-        }
-
-        if (valueColor) {
-            svg.style.setProperty("--progress-value", valueColor);
-        }
-
-        if (duration) {
-            svg.style.setProperty("--progress-duration", `${duration}ms`);
-        }
-
-        const trackCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        trackCircle.setAttribute("class", "progress__track");
-        trackCircle.setAttribute("cx", center);
-        trackCircle.setAttribute("cy", center);
-        trackCircle.setAttribute("r", radius);
-        trackCircle.setAttribute("fill", "none");
-        trackCircle.setAttribute("stroke-width", strokeWidth);
-
-        const valueCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        valueCircle.setAttribute("class", "progress__value");
-        valueCircle.setAttribute("cx", center);
-        valueCircle.setAttribute("cy", center);
-        valueCircle.setAttribute("r", radius);
-        valueCircle.setAttribute("fill", "none");
-        valueCircle.setAttribute("stroke-width", strokeWidth);
-        valueCircle.setAttribute("stroke-dasharray", this.circumference);
-        valueCircle.setAttribute("transform", `rotate(-90 ${center} ${center})`);
-
-        svg.append(trackCircle, valueCircle);
-        this.container.append(svg);
-
-        this.svg = svg;
-        this.valueCircle = valueCircle;
-
-        this.syncViewState();
-    }
-
-    syncViewState() {
-        this.updateValue();
-        this.updateAnimation();
-        this.updateVisibility();
-    }
-
-    setValue(value) {
-        const nextValue = normalizeProgressValue(value);
-
-        if (nextValue === this.state.value) {
-            return;
-        }
-
-        this.state.value = nextValue;
-        this.updateValue();
-    }
-
-    updateValue() {
-        const progress = this.state.value / 100;
-        const dashOffset = this.circumference * (1 - progress);
-
-        this.valueCircle.style.strokeDashoffset = `${dashOffset}`;
-    }
-
-    setAnimated(animated) {
-        this.state.animated = Boolean(animated);
-        this.updateAnimation();
-    }
-
-    updateAnimation() {
-        this.svg.classList.toggle("progress--animated", this.state.animated);
-    }
-
-    setHidden(hidden) {
-        this.state.hidden = Boolean(hidden);
-        this.updateVisibility();
-    }
-
-    updateVisibility() {
-        this.svg.classList.toggle("progress--hidden", this.state.hidden);
+        this.setupGeometry();
+        this.createSvg();
+        this.createCircles();
+        this.applyStyles();
+        this.mount();
+        this.sync();
     }
 
     destroy() {
-        if (this.svg) {
-            this.svg.remove();
+        if (!this.svg) return;
+
+        this.svg.remove();
+        this.svg = null;
+    }
+
+    // ---------- setup ----------
+
+    setupGeometry() {
+        this.center = this.size / 2;
+        this.radius = (this.size - this.strokeWidth) / 2;
+        this.circumference = 2 * Math.PI * this.radius;
+    }
+
+    createSvg() {
+        const svg = createSvgEl("svg");
+
+        svg.setAttribute("class", "progress");
+        svg.setAttribute("viewBox", `0 0 ${this.size} ${this.size}`);
+        svg.setAttribute("width", this.size);
+        svg.setAttribute("height", this.size);
+
+        this.svg = svg;
+    }
+
+    createCircles() {
+        const track = createSvgEl("circle");
+        const value = createSvgEl("circle");
+
+        [track, value].forEach((circle) => {
+            circle.setAttribute("cx", this.center);
+            circle.setAttribute("cy", this.center);
+            circle.setAttribute("r", this.radius);
+            circle.setAttribute("fill", "none");
+            circle.setAttribute("stroke-width", this.strokeWidth);
+        });
+
+        track.setAttribute("class", "progress__track");
+
+        value.setAttribute("class", "progress__value");
+        value.setAttribute("stroke-dasharray", this.circumference);
+        value.setAttribute("transform", `rotate(-90 ${this.center} ${this.center})`);
+
+        this.trackCircle = track;
+        this.valueCircle = value;
+    }
+
+    applyStyles() {
+        if (this.trackColor) {
+            this.svg.style.setProperty("--progress-track", this.trackColor);
         }
 
-        this.svg = null;
-        this.valueCircle = null;
+        if (this.valueColor) {
+            this.svg.style.setProperty("--progress-value", this.valueColor);
+        }
+
+        if (this.duration) {
+            this.svg.style.setProperty("--progress-duration", `${this.duration}ms`);
+        }
+    }
+
+    mount() {
+        this.svg.append(this.trackCircle, this.valueCircle);
+        this.container.append(this.svg);
+    }
+
+    // ---------- state sync ----------
+
+    sync() {
+        this.updateValue();
+        this.updateAnimation();
+        this.updateVisibility();
+    }
+
+    updateValue() {
+        if (!this.valueCircle) return;
+
+        const progress = this.value / 100;
+        const offset = this.circumference * (1 - progress);
+
+        this.valueCircle.style.strokeDashoffset = `${offset}`;
+    }
+
+    updateAnimation() {
+        this.toggleClass("progress--animated", this.animated);
+    }
+
+    updateVisibility() {
+        this.toggleClass("progress--hidden", this.hidden);
+    }
+
+    toggleClass(name, state) {
+        if (!this.svg) return;
+        this.svg.classList.toggle(name, state);
+    }
+
+    // ---------- public API ----------
+
+    setValue(value) {
+        const next = normalizeProgressValue(value);
+        if (next === this.value) return;
+
+        this.value = next;
+        this.updateValue();
+    }
+
+    setAnimated(animated) {
+        this.animated = Boolean(animated);
+        this.updateAnimation();
+    }
+
+    setHidden(hidden) {
+        this.hidden = Boolean(hidden);
+        this.updateVisibility();
     }
 }
