@@ -1,11 +1,11 @@
-﻿.progress__track {
-    stroke: var(--light-grey);
+.progress__track {
+    stroke: var(--progress-track);
 }
 
 .progress__value {
-    stroke: var(--blue);
+    stroke: var(--progress-value);
     stroke-linecap: square;
-    transition: 0.25s ease;
+    transition: stroke-dashoffset 0.25s ease;
 }
 
 .progress--hidden {

@@ -1,18 +1,28 @@
-﻿function clamp(value, min, max) {
+function clamp(value, min, max) {
     if (value < min) return min;
     if (value > max) return max;
     return value;
 }
 
+function normalizeProgressValue(value) {
+    const numericValue = Number(value);
+
+    if (!Number.isFinite(numericValue)) {
+        return 0;
+    }
+
+    return clamp(numericValue, 0, 100);
+}
+
 export default class Progress {
-    constructor(container, options) {
+    constructor(container, options = {}) {
         if (!container) {
-            throw new Error('Progress: container is required');
+            throw new Error("Progress: container is required");
         }
 
         this.container = container;
         this.state = {
-            value: Number(options.value),
+            value: normalizeProgressValue(options.value),
             animated: Boolean(options.animated),
             hidden: Boolean(options.hidden),
         };
@@ -20,53 +30,60 @@ export default class Progress {
             size: options.size ?? 130,
             strokeWidth: options.strokeWidth ?? 10,
             duration: options.duration ?? 1200,
+            trackColor: options.trackColor,
+            valueColor: options.valueColor,
         };
 
         this.render();
     }
 
     render() {
-        const { size, strokeWidth } = this.config;
+        const { size, strokeWidth, duration, trackColor, valueColor } = this.config;
         const center = size / 2;
         const radius = (size - strokeWidth) / 2;
+
         this.circumference = 2 * Math.PI * radius;
 
-        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('class', 'progress');
-        svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
-        svg.setAttribute('width', size);
-        svg.setAttribute('height', size);
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("class", "progress");
+        svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
+        svg.setAttribute("width", size);
+        svg.setAttribute("height", size);
 
-        if (this.config.trackColor)
-            svg.style.setProperty('--progress-track', this.config.trackColor);
-        if (this.config.valueColor)
-            svg.style.setProperty('--progress-value', this.config.valueColor);
-        if (this.config.duration)
-            svg.style.setProperty('--progress-duration', `${this.config.duration}ms`);
+        if (trackColor) {
+            svg.style.setProperty("--progress-track", trackColor);
+        }
 
-        const trackCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        trackCircle.setAttribute('class', 'progress__track');
-        trackCircle.setAttribute('cx', center);
-        trackCircle.setAttribute('cy', center);
-        trackCircle.setAttribute('r', radius);
-        trackCircle.setAttribute('fill', 'none');
-        trackCircle.setAttribute('stroke-width', strokeWidth);
+        if (valueColor) {
+            svg.style.setProperty("--progress-value", valueColor);
+        }
 
-        const valueCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        valueCircle.setAttribute('class', 'progress__value');
-        valueCircle.setAttribute('cx', center);
-        valueCircle.setAttribute('cy', center);
-        valueCircle.setAttribute('r', radius);
-        valueCircle.setAttribute('fill', 'none');
-        valueCircle.setAttribute('stroke-width', strokeWidth);
-        valueCircle.setAttribute('stroke-dasharray', this.circumference);
-        valueCircle.setAttribute('transform', `rotate(-90 ${center} ${center})`);
+        if (duration) {
+            svg.style.setProperty("--progress-duration", `${duration}ms`);
+        }
+
+        const trackCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        trackCircle.setAttribute("class", "progress__track");
+        trackCircle.setAttribute("cx", center);
+        trackCircle.setAttribute("cy", center);
+        trackCircle.setAttribute("r", radius);
+        trackCircle.setAttribute("fill", "none");
+        trackCircle.setAttribute("stroke-width", strokeWidth);
+
+        const valueCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        valueCircle.setAttribute("class", "progress__value");
+        valueCircle.setAttribute("cx", center);
+        valueCircle.setAttribute("cy", center);
+        valueCircle.setAttribute("r", radius);
+        valueCircle.setAttribute("fill", "none");
+        valueCircle.setAttribute("stroke-width", strokeWidth);
+        valueCircle.setAttribute("stroke-dasharray", this.circumference);
+        valueCircle.setAttribute("transform", `rotate(-90 ${center} ${center})`);
 
         svg.append(trackCircle, valueCircle);
         this.container.append(svg);
 
         this.svg = svg;
-        this.trackCircle = trackCircle;
         this.valueCircle = valueCircle;
 
         this.syncViewState();
@@ -78,11 +95,12 @@ export default class Progress {
         this.updateVisibility();
     }
 
-    // Value
     setValue(value) {
-        const nextValue = clamp(Number(value), 0, 100);
+        const nextValue = normalizeProgressValue(value);
 
-        if (nextValue === this.state.value) return;
+        if (nextValue === this.state.value) {
+            return;
+        }
 
         this.state.value = nextValue;
         this.updateValue();
@@ -95,28 +113,22 @@ export default class Progress {
         this.valueCircle.style.strokeDashoffset = `${dashOffset}`;
     }
 
-    // Animation
     setAnimated(animated) {
-        const nextAnimated = Boolean(animated);
-
-        this.state.animated = nextAnimated;
+        this.state.animated = Boolean(animated);
         this.updateAnimation();
     }
 
     updateAnimation() {
-        this.svg.classList.toggle('progress--animated', this.state.animated);
+        this.svg.classList.toggle("progress--animated", this.state.animated);
     }
 
-    // Hidden
     setHidden(hidden) {
-        const nextHidden = Boolean(hidden);
-
-        this.state.hidden = nextHidden;
+        this.state.hidden = Boolean(hidden);
         this.updateVisibility();
     }
 
     updateVisibility() {
-        this.svg.classList.toggle('progress--hidden', this.state.hidden);
+        this.svg.classList.toggle("progress--hidden", this.state.hidden);
     }
 
     destroy() {
@@ -125,5 +137,6 @@ export default class Progress {
         }
 
         this.svg = null;
+        this.valueCircle = null;
     }
 }
