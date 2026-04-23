@@ -1,4 +1,4 @@
-.progress__track {
+﻿.progress__track {
     stroke: var(--light-grey);
 }
 
@@ -9,7 +9,7 @@
 }
 
 .progress--hidden {
-    visibility: hidden;
+    display: none;
 }
 
 .progress--animated {

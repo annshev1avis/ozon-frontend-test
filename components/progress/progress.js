@@ -1,4 +1,4 @@
-function clamp(value, min, max) {
+﻿function clamp(value, min, max) {
     if (value < min) return min;
     if (value > max) return max;
     return value;
@@ -69,10 +69,16 @@ export default class Progress {
         this.trackCircle = trackCircle;
         this.valueCircle = valueCircle;
 
-        this.updateValue();
+        this.syncViewState();
     }
 
-    // Управление Value
+    syncViewState() {
+        this.updateValue();
+        this.updateAnimation();
+        this.updateVisibility();
+    }
+
+    // Value
     setValue(value) {
         const nextValue = clamp(Number(value), 0, 100);
 
@@ -89,7 +95,7 @@ export default class Progress {
         this.valueCircle.style.strokeDashoffset = `${dashOffset}`;
     }
 
-    // Управление Animation
+    // Animation
     setAnimated(animated) {
         const nextAnimated = Boolean(animated);
 
@@ -101,7 +107,7 @@ export default class Progress {
         this.svg.classList.toggle('progress--animated', this.state.animated);
     }
 
-    // Управление Hidden
+    // Hidden
     setHidden(hidden) {
         const nextHidden = Boolean(hidden);
 
