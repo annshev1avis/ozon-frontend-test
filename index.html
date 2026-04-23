@@ -15,28 +15,7 @@
       <h1 class="demo__title">Progress</h1>
       <div class="demo__container">
         <div class="demo__progress-and-controls">
-          <div id="progress-container" class="demo__progress">
-            <svg
-              class="progress"
-              width="150"
-              height="150"
-            >
-              <circle
-                class="progress__track"
-                cx="75"
-                cy="75"
-                r="65"
-              ></circle>
-              <circle
-                class="progress__value"
-                cx="75"
-                cy="75"
-                r="65"
-                stroke-dasharray="300.48"
-                stroke-dashoffset="141.37"
-              ></circle>
-            </svg>
-          </div>
+          <div id="progress-container" class="demo__progress"></div>
           <div class="demo__controls">
             <div class="control">
               <input id="value-input" class="field" type="number" value="65" min="0" max="100"/>
@@ -62,6 +41,6 @@
     </section>
   </main>
 
-  <script src="app.js"></script>
+  <script src="app.js" type="module"></script>
 </body>
 </html>

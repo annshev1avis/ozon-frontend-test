@@ -1,13 +1,27 @@
 .progress__track {
-    fill: none;
     stroke: var(--light-grey);
-    stroke-width: 10px;
 }
 
 .progress__value {
-    fill: none;
     stroke: var(--blue);
-    stroke-width: 10px;
     stroke-linecap: square;
-    transition: stroke-dashoffset 0.25s ease;
+    transition: 0.25s ease;
+}
+
+.progress--hidden {
+    visibility: hidden;
+}
+
+.progress--animated {
+    animation: progress-rotate var(--progress-duration) linear infinite;
+}
+
+@keyframes progress-rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }

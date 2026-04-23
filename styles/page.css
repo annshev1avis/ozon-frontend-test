@@ -7,6 +7,11 @@
     --blue: #005cff;
     --black: #000000;
 
+    /* Параметры компонентов */
+    --progress-track: var(--light-grey);
+    --progress-value: var(--blue);
+    --progress-duration: 1200ms;
+
     /* Размеры элементов */
     --input-height: 30px;
     --input-width: 50px;
@@ -42,7 +47,7 @@ body {
     align-items: center;
     justify-items: center;
 
-    padding: 60px 0px 130px;
+    padding: 70px 0px 130px;
 }
 
 .demo__controls {
@@ -110,4 +115,20 @@ body {
 
 .switch:has(input:checked)::before {
   transform: translateX(20px);
+}
+
+@media (orientation: landscape) {
+    .demo__progress-and-controls {
+        width: auto;
+        height: 85vh;
+
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 100%;
+
+        align-items: center;
+        justify-items: center;
+
+        padding: 0px 80px 0px;
+    }
 }
