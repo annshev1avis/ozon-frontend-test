@@ -138,7 +138,16 @@ body {
     .demo__progress-and-controls {
         width: min(100%, 720px);
         grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr;
         align-items: center;
         gap: 48px;
+    }
+
+    .demo__progress {
+        align-self: unset;
+    }
+
+    .demo__controls {
+        align-self: unset;
     }
 }
